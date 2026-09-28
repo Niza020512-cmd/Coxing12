@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Coxing Simulator">
+<meta name="theme-color" content="#061d36">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Coxing Simulator</title>
+<style>
+:root{--navy:#061d36;--navy2:#092d4b;--blue:#168df0;--water:#0873a5;--text:#fff;--muted:#a9c7dc;--panel:rgba(3,28,51,.88)}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);touch-action:manipulation}button,input,select{font:inherit}button{-webkit-tap-highlight-color:transparent}
+.app{height:100%;display:flex;flex-direction:column;background:var(--navy)}
+.screen{display:none;height:100%;flex-direction:column}.screen.active{display:flex}
+/* MENU */
+#menu{align-items:center;justify-content:center;padding:28px;background:radial-gradient(circle at 50% 15%,#124f79,#061d36 62%)}
+.menuCard{width:min(720px,92vw);background:rgba(3,28,51,.9);border:1px solid #1b5d88;border-radius:28px;padding:30px;box-shadow:0 18px 60px rgba(0,0,0,.3);text-align:center}
+.appMark{width:72px;height:72px;border-radius:18px;margin:0 auto 12px}.menuTitle{font-size:38px;font-weight:950;letter-spacing:-1px}.menuSub{color:var(--muted);margin:4px 0 24px}.menuGrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:520px;margin:0 auto}.menuBtn{min-height:110px;border:1px solid #245f88;border-radius:18px;background:#0a3155;color:#fff;padding:18px;text-align:center;font-weight:900}.menuBtn strong{display:block;font-size:20px}.menuBtn span{display:block;color:#a9c7dc;font-size:12px;margin-top:6px;font-weight:500}.menuBtn.primary{background:linear-gradient(180deg,#168df0,#0873c9);border-color:#5bb6ff}.menuFooter{margin-top:18px;color:#7fa7c1;font-size:11px}
+/* APP */
+header{height:78px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 18px;background:linear-gradient(180deg,#061d36,#082b4b);gap:12px}.brand{display:flex;align-items:center;gap:10px;min-width:205px}.appIcon{width:44px;height:44px;border-radius:11px}.title{font-size:22px;font-weight:950}.tag{font-size:10px;color:#a9c7dc}.metrics{display:flex;align-items:stretch;background:#062642;border:1px solid #164d76;border-radius:13px;overflow:hidden}.metric{min-width:105px;padding:8px 14px;border-right:1px solid #164d76}.metric:last-child{border:0}.metric small{display:block;color:#a8c5dc;font-size:10px}.metric b,.metric select{display:block;font-size:16px;margin-top:2px;color:#fff;font-weight:900;background:transparent;border:0;outline:0}.windbox{display:flex;align-items:center;gap:8px;background:#062642;border:1px solid #164d76;border-radius:13px;padding:8px 12px;min-width:150px}.windIcon{font-size:26px}.windbox small{display:block;color:#a8c5dc;font-size:10px}.windbox b{font-size:15px}.topBtn{height:42px;border:1px solid #287db5;background:#0a3155;color:#fff;border-radius:11px;padding:0 13px;font-weight:900}
+#course{position:relative;flex:1;min-height:0;overflow:hidden;background:linear-gradient(180deg,#8bdaf4 0%,#0b8abc 18%,#0875a6 70%,#075d8b 100%);border-top:1px solid #164d76;border-bottom:1px solid #164d76}
+.water{position:absolute;inset:-20%;background:linear-gradient(180deg,#36b7dc 0%,#087fae 42%,#075f8d 100%),repeating-linear-gradient(178deg,rgba(255,255,255,.12) 0 2px,transparent 2px 11px),repeating-linear-gradient(2deg,rgba(0,30,65,.12) 0 1px,transparent 1px 15px);opacity:.9;animation:waterMove .8s linear infinite}@keyframes waterMove{to{background-position:220px 90px,-150px -80px}}
+.skyline,.trees{display:none}
+.courseWorld{position:absolute;inset:0;z-index:2;transform:translateY(0)}.lane{position:absolute;top:0;bottom:0;width:33.3333%;border-left:1px dashed rgba(255,255,255,.5);border-right:1px dashed rgba(255,255,255,.5)}.lane1{left:0}.lane2{left:33.3333%}.lane3{left:66.6666%}.playerLane{position:absolute;left:33.3333%;width:33.3333%;top:0;bottom:0;background:rgba(80,190,255,.035);pointer-events:none}.lane4,.lane5,.lane6,.lane7,.lane8{display:none}.distanceMarks{position:absolute;top:0;bottom:-100%;left:4%;right:4%;pointer-events:none;z-index:4}.distanceMark{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.16)}.distanceMark.major{height:2px;background:rgba(255,255,255,.30)}.distanceMark span{position:absolute;right:8px;top:-7px;font-size:8px;color:rgba(255,255,255,.62);background:rgba(3,28,51,.35);padding:1px 3px;border-radius:3px}.buoys{position:absolute;top:0;bottom:-100%;left:0;right:0}.buoy{position:absolute;width:11px;height:11px;border-radius:50%;background:#ff4a3d;box-shadow:0 2px 5px rgba(0,0,0,.35)}.start{position:absolute;left:4%;right:4%;height:8px;background:#fff;z-index:5;box-shadow:0 0 0 2px rgba(0,0,0,.2)}.start{top:92%}.finish{position:absolute;left:4%;right:4%;height:10px;z-index:5;background:repeating-linear-gradient(90deg,#111 0 14px,#fff 14px 28px)}.finishText{position:absolute;background:#0b2138;padding:4px 25px;border-radius:4px;font-weight:900;font-size:14px;z-index:6;left:50%;transform:translateX(-50%)}
+#windStreams{position:absolute;inset:0;z-index:3;pointer-events:none}.windStream{position:absolute;height:2px;background:rgba(255,255,255,.7);border-radius:3px}.windStream:after{content:"";position:absolute;right:-2px;top:-4px;border-left:10px solid rgba(255,255,255,.8);border-top:5px solid transparent;border-bottom:5px solid transparent}
+#windReadout{position:absolute;left:16px;top:16px;z-index:15;background:rgba(3,28,51,.78);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:8px 12px;backdrop-filter:blur(8px)}#windReadout b{font-size:14px}#windReadout small{display:block;color:#b9d4e8;margin-top:2px}
+/* HORIZONTAL BOATS */
+#boats{position:absolute;inset:0;z-index:8}.raceBoat{position:absolute;width:132px;height:300px;transform:translate(-50%,-50%);filter:drop-shadow(0 5px 5px rgba(0,0,0,.28));transition:left .08s linear,top .08s linear}.hull{position:absolute;left:47px;top:25px;width:26px;height:250px;background:linear-gradient(90deg,#e9f1f6,#b8cbd8 55%,#718b9e);border:2px solid #243b4e;border-radius:50% 50% 45% 45%;clip-path:polygon(50% 0,78% 5%,100% 18%,82% 94%,50% 100%,18% 94%,0 18%,22% 5%)}.deckline{position:absolute;left:59px;top:31px;width:2px;height:238px;background:#6d8598;opacity:.55}.seatline{position:absolute;left:39px;width:42px;height:3px;background:#40586b;border-radius:2px;transform:translateY(-50%)}.oar{position:absolute;width:72px;height:3px;background:#b77b40;border-radius:3px;top:0;transform:none;will-change:transform}.oar:after{content:"";position:absolute;width:18px;height:11px;border-radius:2px;background:#e8eef3;border:1px solid #496177;top:-4px}.oarL{left:-31px;transform-origin:100% 50%;}.oarL:after{left:-16px}.oarR{left:78px;transform-origin:0 50%;}.oarR:after{right:-16px}.bowLabel,.strokeLabel{position:absolute;font-weight:950;font-size:9px;white-space:nowrap;background:rgba(3,28,51,.8);padding:2px 5px;border-radius:4px;left:50%;transform:translateX(-50%)}.bowLabel{top:0}.strokeLabel{bottom:0}@keyframes strokeLeft{0%,100%{transform:rotate(-14deg)}35%{transform:rotate(18deg)}55%{transform:rotate(5deg)}75%{transform:rotate(-10deg)}}@keyframes strokeRight{0%,100%{transform:rotate(14deg)}35%{transform:rotate(-18deg)}55%{transform:rotate(-5deg)}75%{transform:rotate(10deg)}}.youBoat .hull{border-color:#0b6bd3;box-shadow:inset 0 0 0 2px #75c5ff}.youBoat .bowLabel{background:#0b6bd3}.other1 .hull{background:linear-gradient(180deg,#f2d96c,#d4b64d)}.other2 .hull{background:linear-gradient(180deg,#75c3ff,#4b91c8)}.other3 .hull{background:linear-gradient(180deg,#b884ff,#8050c0)}.other4 .hull{background:linear-gradient(180deg,#67e0c8,#2c9f91)}
+#leaderboard{position:absolute;right:15px;top:15px;width:195px;z-index:15;background:rgba(3,28,51,.84);border:1px solid rgba(255,255,255,.15);border-radius:13px;overflow:hidden;backdrop-filter:blur(8px)}.row{height:35px;display:flex;align-items:center;gap:8px;padding:0 10px;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px}.row:last-child{border:0}.row .num{width:15px;font-weight:900}.row.you{background:rgba(30,141,240,.55)}.boatDot{width:24px;height:6px;border-radius:50%;background:#fff}
+/* COACH */
+#coach{position:absolute;left:16px;bottom:15px;width:225px;z-index:16;background:rgba(3,28,51,.9);border:1px solid #287db5;border-radius:14px;padding:10px 12px;backdrop-filter:blur(9px)}.coachTitle{font-size:10px;color:#9fc2d9;font-weight:900;letter-spacing:.8px}.coachMain{display:flex;justify-content:space-between;align-items:end;margin-top:4px}.coachMain b{font-size:23px}.coachMain span{font-size:10px;color:#a9c7dc}.coachSplit{text-align:right}.coachRate{text-align:left}.coachBar{height:5px;border-radius:4px;background:#173e59;margin-top:7px;overflow:hidden}.coachBar i{display:block;height:100%;width:65%;background:#55baff}.coachHint{font-size:9px;color:#a9c7dc;margin-top:5px}
+#steerPanel{position:absolute;z-index:20;left:50%;bottom:17px;transform:translateX(-50%);width:min(430px,36vw);background:rgba(3,28,51,.9);border:1px solid #178df0;border-radius:20px;padding:10px 16px 9px;backdrop-filter:blur(10px)}#steerPanel label{display:block;text-align:center;font-weight:900;font-size:14px;margin-bottom:2px}#steer{width:100%;accent-color:#69c4ff;height:28px}.steerScale{display:flex;justify-content:space-between;font-size:9px;color:#b7cee3}.sideBtn{position:absolute;bottom:15px;width:82px;height:82px;border-radius:50%;z-index:21;border:2px solid #168df0;background:rgba(3,28,51,.9);color:#fff;font-weight:900;font-size:11px;box-shadow:0 5px 18px rgba(0,0,0,.2)}.sideBtn span{display:block;font-size:28px;line-height:25px}#leftBtn{right:255px}#rightBtn{right:160px}
+#callFlash{position:absolute;left:50%;top:17%;transform:translateX(-50%) scale(.96);z-index:30;pointer-events:none;opacity:0;transition:opacity .12s,transform .12s;background:rgba(3,28,51,.9);border:2px solid #69c4ff;border-radius:12px;padding:10px 24px;font-size:20px;font-weight:950;letter-spacing:.5px;box-shadow:0 8px 25px rgba(0,0,0,.25)}#callFlash.show{opacity:1;transform:translateX(-50%) scale(1)}#callPanel{position:absolute;right:15px;bottom:108px;width:250px;max-height:250px;overflow:auto;z-index:18;background:rgba(3,28,51,.92);border:1px solid #287db5;border-radius:14px;padding:9px;backdrop-filter:blur(9px)}#callPanel .primaryCalls{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}#callPanel .primaryCalls button{min-height:34px;border-radius:8px;color:#fff;font-weight:950;border:1px solid #5fbfff}#callPanel .attentionCall{background:#0a3155}.goCall{background:#168df0}#callPanel .callTitle{font-size:10px;color:#a9c7dc;font-weight:900;letter-spacing:.7px;margin-bottom:6px}#callButtons{display:grid;grid-template-columns:1fr 1fr;gap:5px}#callButtons button{min-height:30px;border:1px solid #285f83;border-radius:7px;background:#0a3155;color:#fff;font-size:9px;font-weight:800}#callButtons button:active{background:#168df0}#callButtons kbd{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:3px;border-radius:4px;background:#123f61;color:#9fd5ff;font-size:9px;font-weight:950}#callLog{margin-top:6px;font-size:9px;color:#b9d4e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bottom{height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 16px;background:#061d36}.controlGroup{display:flex;align-items:center;gap:8px}.selectWrap{background:#0a3155;border:1px solid #164d76;border-radius:10px;padding:4px 9px}.selectWrap label{display:block;font-size:8px;color:#a8c5dc}.selectWrap select{border:0;background:transparent;color:#fff;font-weight:900;font-size:13px;outline:0}.windControl{width:230px}.windControl label{font-size:9px;color:#a8c5dc}.windControl input{width:100%;accent-color:#168df0}.windScale{display:flex;justify-content:space-between;font-size:8px;color:#8fb2ca}.windControl input{margin:2px 0}.windControl label b{color:#fff}.action{height:40px;border:1px solid #287db5;border-radius:10px;padding:0 13px;background:#0a3155;color:#fff;font-weight:900}.primary{background:#168df0;border-color:#168df0}.status{font-size:10px;color:#b7cee3;min-width:120px;text-align:right}.status b{color:#fff}
+@media(max-width:900px){header{height:66px;padding:7px 10px}.title{font-size:17px}.tag{display:none}.appIcon{width:35px;height:35px}.metrics .metric{min-width:78px;padding:6px 8px}.metrics .metric:nth-child(2){display:none}.metric b,.metric select{font-size:13px}.windbox{min-width:110px}.topBtn{padding:0 9px}#leaderboard{width:155px;right:8px;top:8px}.row{height:30px;font-size:10px}#coach{left:8px;bottom:9px;width:175px}.coachMain b{font-size:19px}.coachHint{display:none}#steerPanel{bottom:10px;width:34vw}.sideBtn{width:68px;height:68px;bottom:10px;font-size:9px}.sideBtn span{font-size:23px}#leftBtn{right:125px}#rightBtn{right:48px}.bottom{height:58px;padding:5px 8px}.windControl{width:180px}.status{display:none}.menuCard{padding:22px}.menuGrid{grid-template-columns:1fr}.menuTitle{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="app">
+<section id="menu" class="screen active">
+  <div class="menuCard">
+    <img class="appMark" src="icon-192.png" alt="Coxing Simulator icon">
+    <div class="menuTitle">Coxing Simulator</div>
+    <div class="menuSub">Race, steer, read the wind and practise coxing skills.</div>
+    <div class="menuGrid">
+      <button class="menuBtn primary" id="menuRace"><strong>🏁 Race Training</strong><span>Race, control your line, counter the wind and practise cox calls.</span></button>
+    </div>
+    <div class="menuFooter">Designed for coxing practice · touch controls · offline capable</div>
+  </div>
+</section>
+<section id="raceScreen" class="screen">
+<header><div class="brand"><img class="appIcon" src="icon-192.png" alt=""><div><div class="title">Coxing Simulator</div><div class="tag">Racing & coxing practice</div></div></div>
+<div class="metrics"><div class="metric"><small>Race</small><select id="raceSelect"><option value="500">500 m</option><option value="1000">1,000 m</option><option value="2000" selected>2,000 m</option><option value="5000">5,000 m</option><option value="6000">6,000 m</option></select></div><div class="metric"><small>Time</small><b id="time">00:00.0</b></div><div class="metric"><small>Position</small><b id="position">1 / 3</b></div><div class="metric"><small>Crew</small><select id="crewSelect"><option value="4">4 per side</option><option value="8">8 per side</option></select></div></div>
+<div class="windbox"><div class="windIcon">≋</div><div><small>Wind</small><b id="windTop">0.0 m/s</b><small id="windDir">→ From right</small></div></div><button class="topBtn" id="backMenu">MENU</button></header>
+<div id="course"><div class="water"></div><div class="skyline"></div><div class="trees"></div><div id="courseWorld" class="courseWorld"><div class="lane lane1"></div><div class="lane lane2"></div><div class="lane lane3"></div><div class="playerLane"></div><div class="lane lane4"></div><div class="lane lane5"></div><div class="lane lane6"></div><div class="lane lane7"></div><div class="lane lane8"></div><div class="distanceMarks" id="distanceMarks"></div><div class="buoys" id="buoys"></div><div id="finishLine" class="finish"></div><div id="finishText" class="finishText">FINISH</div><div id="startLine" class="start"></div></div>
+<div id="windStreams"></div><div id="windReadout"><b id="windBig">Calm</b><small id="windSmall">Wind strength</small></div><div id="boats"></div><div id="leaderboard"></div><div id="callPanel"><div class="callTitle">COX CALLS · KEYBOARD 1–9</div><div class="primaryCalls"><button class="attentionCall" data-call="Attention" data-key="a">ATTENTION</button><button class="goCall" data-call="Go" data-key="g">GO</button></div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="callNumber" type="number" min="1" max="50" value="10" style="width:58px;border:1px solid #285f83;border-radius:7px;background:#0a3155;color:#fff;padding:6px;font-weight:900"><button data-call="Set number" style="flex:1;min-height:30px;border:1px solid #285f83;border-radius:7px;background:#168df0;color:#fff;font-size:9px;font-weight:900">SET NUMBER</button></div><div id="callButtons"><button data-key="1" data-call="Lengthen"><kbd>1</kbd> Lengthen</button><button data-key="2" data-call="Pressure on bow side"><kbd>2</kbd> Pressure bow</button><button data-key="3" data-call="Pressure on stroke side"><kbd>3</kbd> Pressure stroke</button><button data-key="4" data-call="Hold the run"><kbd>4</kbd> Hold the run</button><button data-key="5" data-call="Straighten"><kbd>5</kbd> Straighten</button><button data-key="6" data-call="Number on"><kbd>6</kbd> Number on</button><button data-key="7" data-call="Prepare for finish"><kbd>7</kbd> Prepare for finish</button><button data-key="8" data-call="Power up"><kbd>8</kbd> Power up</button><button data-key="9" data-call="Settle"><kbd>9</kbd> Settle</button><button data-call="Build pressure">Build pressure</button></div><div id="callLog">Ready for a call.</div></div>
+<div id="callFlash" aria-live="polite"></div><div id="coach"><div class="coachTitle">STROKE COACH</div><div class="coachMain"><div class="coachRate"><span>RATE</span><b id="rate">32</b></div><div class="coachSplit"><span>500 SPLIT</span><b id="split">1:58</b></div></div><div class="coachBar"><i id="coachBar"></i></div><div class="coachHint" id="coachHint">Hold a steady rate and keep the shell straight.</div></div>
+<button class="sideBtn" id="leftBtn"><span>‹</span>BOW</button><button class="sideBtn" id="rightBtn"><span>›</span>STROKE</button>
+<div id="steerPanel"><label>STEER</label><input id="steer" type="range" min="-100" max="100" value="0"><div class="steerScale"><span>‹ BOW</span><span id="headingReadout">0°</span><span>STROKE ›</span></div></div></div>
+<div class="bottom"><div class="controlGroup"><div class="selectWrap"><label>CREW</label><select id="crewSelect2"><option value="4">4 per side</option><option value="8">8 per side</option></select></div><div class="windControl"><label>WIND DIFFICULTY <b id="windSliderValue">CALM · 0–1 m/s</b></label><input id="windSlider" type="range" min="0" max="3" step="1" value="0"><div class="windScale"><span>CALM</span><span>LIGHT</span><span>HARD</span><span>EXTREME</span></div></div></div><div class="controlGroup"><button class="action primary" id="start">▶ Start Race</button><button class="action" id="reset">↻ Reset</button></div><div class="status"><b id="status">READY</b><br><span id="scoreText">Score 1000</span></div></div>
+</section>
+
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const menu=$('menu'),raceScreen=$('raceScreen');
+function show(s){[menu,raceScreen].forEach(x=>x.classList.remove('active'));s.classList.add('active');if(s===raceScreen)render()}
+$('menuRace').onclick=()=>{show(raceScreen);reset()};$('backMenu').onclick=()=>{pause();show(menu)};
+/* RACE */
+const course=$('course'),boatsBox=$('boats'),steer=$('steer'),windSlider=$('windSlider');
+let run=false,raf=0,last=0,startTime=0,elapsed=0,progress=0,x=50,h=0,score=1000,windSpeed=0,windAngle=0,key=0,crew=4,rate=32,otherProgress=[0,0],otherXs=[16.6667,83.3333],otherHeadings=[0,0],otherPhases=[0.08,0.32],otherRates=[31.4,32.3],latVel=0,strokePhase=0,lastPhase=0,callNumber=10,waterShift=0,strokeCount=0,windDifficulty=0,callFlashTimer=0,boatSpeed=4.85,displaySpeed=4.85,rudder=0;
+const W=[['→','From right / Stroke'],['↘','Front-right'],['↓','Ahead'],['↙','Front-left'],['←','From left / Bow'],['↖','Rear-left'],['↑','Behind'],['↗','Rear-right']];
+const laneCenters=[16.6667,50,83.3333];
+const userYFrac=.68;
+function raceMeters(){return +$('raceSelect').value}
+function visibleMeters(){return 300}
+function traveledMeters(){return progress*raceMeters()}
+function makeBuoys(){const box=$('buoys'),marks=$('distanceMarks');box.innerHTML='';marks.innerHTML='';for(let d=0;d<=raceMeters()+220;d+=5){if(d>0){const m=document.createElement('div');m.className='distanceMark';m.dataset.dist=d;if(d%50===0)m.classList.add('major');m.innerHTML=d%50===0?`<span>${d} m</span>`:'';marks.appendChild(m)}if(d%50===0)for(const pct of [0,33.333,66.666,100]){const e=document.createElement('div');e.className='buoy';e.dataset.dist=d;e.style.left=pct+'%';box.appendChild(e)}}}
+function boatMarkup(i){let n=crew===8?16:8,s='';for(let j=0;j<n;j++){let y=38+j*(224/(n-1||1));s+=`<div class="seatline" style="top:${y}px"></div><div class="oar oarL" style="top:${y}px"></div><div class="oar oarR" style="top:${y}px"></div>`}return `<div class="hull"></div><div class="deckline"></div>${s}<div class="bowLabel">BOW</div><div class="strokeLabel">STROKE</div>`}
+function makeBoats(){boatsBox.innerHTML='';const cls=['youBoat','other1','other2'];for(let i=0;i<3;i++){const b=document.createElement('div');b.className='raceBoat '+cls[i];b.dataset.i=i;b.innerHTML=boatMarkup(i);boatsBox.appendChild(b)}}
+function windDir(){const idx=((Math.round(windAngle/(Math.PI/4))%8)+8)%8;const [arrow,name]=W[idx];$('windDir').textContent=arrow+' '+name;$('windSmall').textContent=name}
+function windRange(level){return [[0,1],[1,2],[2,3],[2,5]][clamp(level,0,3)]}
+function windDifficultyName(level){return ['CALM','LIGHT','HARD','EXTREME'][clamp(level,0,3)]}
+function renderWind(){const box=$('windStreams');box.innerHTML='';const count=Math.round(2+windSpeed*.3);for(let i=0;i<count;i++){const e=document.createElement('div');e.className='windStream';const len=55+Math.random()*90;e.style.width=len+'px';e.style.left=(-len-Math.random()*100)+'px';e.style.top=(18+Math.random()*70)+'%';e.style.setProperty('--wa',(windAngle*180/Math.PI)+'deg');e.style.animation=`windTravel ${Math.max(1.15,1.9-windSpeed*.04)+Math.random()*.35}s linear infinite`;e.style.animationDelay=(-Math.random()*2)+'s';box.appendChild(e)}}
+const st=document.createElement('style');st.textContent='@keyframes windTravel{from{transform:translateX(-160px) rotate(var(--wa,0deg));opacity:0}15%{opacity:.8}80%{opacity:.55}to{transform:translateX(1200px) rotate(var(--wa,0deg));opacity:0}}';document.head.appendChild(st);
+function setWindDifficulty(level,randomize=true){windDifficulty=clamp(Math.round(+level),0,3);$('windSlider').value=windDifficulty;const [lo,hi]=windRange(windDifficulty);windSpeed=lo===hi?lo:Math.floor(lo+Math.random()*(hi-lo+1));$('windSliderValue').textContent=`${windDifficultyName(windDifficulty)} · ${lo}–${hi} m/s`;$('windTop').textContent=windSpeed+' m/s';$('windBig').textContent=windSpeed===0?'Calm':windSpeed+' m/s';if(randomize){windAngle=Math.random()*Math.PI*2}windDir();renderWind()}
+function randomizeWind(){const [lo,hi]=windRange(windDifficulty);windSpeed=lo===hi?lo:Math.floor(lo+Math.random()*(hi-lo+1));windAngle=Math.random()*Math.PI*2;$('windTop').textContent=windSpeed+' m/s';$('windBig').textContent=windSpeed===0?'Calm':windSpeed+' m/s';windDir();renderWind()}
+function setCrew(v){crew=+v;$('crewSelect').value=v;$('crewSelect2').value=v;makeBoats();render()}
+function driveFactor(phase){if(phase<.12)return 0;if(phase<.58)return Math.sin(((phase-.12)/.46)*Math.PI/2);if(phase<.68)return Math.cos(((phase-.58)/.10)*Math.PI/2);return 0}
+function oarAngles(phase){if(phase<.12){const q=phase/.12;return [24-10*q,-24+10*q]}if(phase<.58){const q=(phase-.12)/.46;return [14-36*q,-14+36*q]}if(phase<.68){const q=(phase-.58)/.10;return [-22+8*q,22-8*q]}const q=(phase-.68)/.32;return [-14+38*q,14-38*q]}
+function setBoatOars(boat,phase){const [left,right]=oarAngles(phase);boat.querySelectorAll('.oarL').forEach(o=>o.style.transform=`rotate(${left}deg)`);boat.querySelectorAll('.oarR').forEach(o=>o.style.transform=`rotate(${right}deg)`)}
+function animateOars(t){document.querySelectorAll('.raceBoat').forEach((boat,i)=>{const phase=i===0?strokePhase:(((t/1000)*(otherRates[i-1]/60)+otherPhases[i-1])%1);setBoatOars(boat,phase)})}
+function update(dt,t){
+ const dtS=dt/1000;
+ const steerInput=key!==0?key:clamp(+steer.value/100,-1,1);
+ strokePhase=((t/1000)*(rate/60))%1;
+ const drive=driveFactor(strokePhase);
+
+ // GAME-LIKE RUDDER: hold a direction to keep turning. Releasing the key returns
+ // the rudder to neutral, but the shell keeps its current heading.
+ const desiredRudder=clamp(steerInput,-1,1);
+ rudder += (desiredRudder-rudder)*(1-Math.exp(-dtS*14));
+ const turnRate=16; // degrees/second at full rudder
+ h=clamp(h + rudder*turnRate*dtS,-24,24);
+ steer.value=Math.round(rudder*100);
+ lastPhase=strokePhase;
+
+ // Wind is a gentle cross-current. It nudges the shell; the rudder remains dominant.
+ const headingRad=h*Math.PI/180;
+ const windTravelAngle=windAngle+Math.PI;
+ const windRel=windTravelAngle-headingRad;
+ const windCross=Math.sin(windRel);
+ const windAlong=Math.cos(windRel);
+ const windAccel=windSpeed*0.018*windCross;
+ latVel += windAccel*dtS;
+ latVel *= Math.exp(-dtS/1.8);
+ latVel=clamp(latVel,-0.32,0.32);
+
+ // CONSTANT MOMENTUM + A SMALL DRIVE IMPULSE.
+ // The shell never stops in recovery. When the blades have finished the catch
+ // movement and are ready to pull, a short acceleration impulse is applied.
+ const effectiveCrew=crew===8?1.06:1;
+ const baseSpeed=4.85*(rate/32)*effectiveCrew;
+ const headTail=clamp(1 + windAlong*windSpeed*0.006,-0.025,0.025);
+ const targetCruise=baseSpeed*headTail;
+ boatSpeed += (targetCruise-boatSpeed)*(1-Math.exp(-dtS*0.72));
+ if(lastPhase < .12 && strokePhase >= .12){
+   boatSpeed += 0.20 + Math.min(0.08,(rate-28)*0.004);
+   strokeCount++;
+ }
+ boatSpeed=clamp(boatSpeed,3.4,7.0);
+
+ // Slight real shell drift from heading plus wind. Steering therefore changes direction,
+ // rather than teleporting the boat sideways.
+ const lateralFromHeading=boatSpeed*Math.sin(headingRad);
+ const courseWidthM=36;
+ const dxPercent=((lateralFromHeading+latVel)*dtS/courseWidthM)*100;
+ x=clamp(x+dxPercent,8,92);
+ progress=clamp(progress+(boatSpeed*dtS)/raceMeters(),0,1);
+
+ // Coach speed is deliberately slower to react than the shell's instant speed.
+ displaySpeed += (boatSpeed-displaySpeed)*(1-Math.exp(-dtS/3.5));
+
+ // Rivals have independent stroke timing, speed and small natural pacing variation.
+ otherProgress=otherProgress.map((p,i)=>{
+   const phase=((t/1000)*(otherRates[i]/60)+otherPhases[i])%1;
+   const odrive=driveFactor(phase);
+   const oTarget=4.05*(otherRates[i]/32)*(i===0?1.012:.992);
+   const ospeed=oTarget*(1+(odrive-.28)*.10);
+   return clamp(p+(ospeed*dtS)/raceMeters(),0,1);
+ });
+ animateOars(t);
+ elapsed=(performance.now()-startTime)/1000;
+ waterShift+=dt*(1.5+rate/35);
+
+ const laneCenter=laneCenters[1];
+ const laneOffset=Math.abs(x-laneCenter);
+ score=clamp(score-(Math.max(0,laneOffset-13)*.015+Math.abs(h)*.001)*dt/16.67,0,1000);
+ $('rate').textContent=Math.round(rate);$('headingReadout').textContent=(h>=0?'+':'')+h.toFixed(1)+'°';
+ // Real-time rowing split: a rolling/smoothed speed estimate, not the instantaneous stroke phase.
+ const simSplit=500/Math.max(3.4,displaySpeed);
+ const sec=Math.floor(simSplit/60),rem=Math.round(simSplit%60);
+ $('split').textContent=`${sec}:${String(rem).padStart(2,'0')}`;
+ $('coachBar').style.width=clamp(35+drive*55,20,95)+'%';
+ $('coachHint').textContent=Math.abs(h)>18?'Ease the rudder — hold a controlled heading.':Math.abs(latVel)>.14?'Small correction — wind is nudging the shell.':drive>.45?'Drive — clean connection and acceleration.':'Recovery — prepare for the catch.';
+ if(callFlashTimer>0){callFlashTimer-=dt;if(callFlashTimer<=0){$('callFlash').classList.remove('show')}}
+}
+
+function fmt(t){const m=Math.floor(t/60),s=(t%60).toFixed(1).padStart(4,'0');return String(m).padStart(2,'0')+':'+s}
+function render(){
+ const rect=course.getBoundingClientRect(),userY=rect.height*userYFrac,visible=visibleMeters(),travel=traveledMeters();
+ // Player stays in its own middle lane; the course/water moves beneath it.
+ const user=boatsBox.querySelector('.youBoat');if(user){user.style.left=x+'%';user.style.top=userY+'px';user.style.transform=`translate(-50%,-50%) rotate(${h}deg)`}
+ // Lane lines are static and full-height. Distance markers, buoys and finish line move toward the crew.
+ document.querySelectorAll('#distanceMarks .distanceMark').forEach(e=>{const d=+e.dataset.dist;const y=userY-((d-travel)/visible)*rect.height;e.style.top=y+'px';e.style.display=(y>-20&&y<rect.height+20)?'block':'none'});
+ document.querySelectorAll('#buoys .buoy').forEach(e=>{const d=+e.dataset.dist;const y=userY-((d-travel)/visible)*rect.height; e.style.top=y+'px';e.style.display=(y>-20&&y<rect.height+20)?'block':'none'});
+ const finishY=userY-((raceMeters()-travel)/visible)*rect.height;
+ const finish=$('finishLine'),finishText=$('finishText');finish.style.top=finishY+'px';finishText.style.top=(finishY-26)+'px';finish.style.display=(finishY>-20&&finishY<rect.height+20)?'block':'none';finishText.style.display=finish.style.display;
+ const startY=userY+145;$('startLine').style.top=startY+'px';$('startLine').style.display=travel<25?'block':'none';
+ otherProgress.forEach((p,i)=>{const b=boatsBox.querySelector(`[data-i="${i+1}"]`);if(!b)return;const y=userY-((p*raceMeters()-travel)/visible)*rect.height;b.style.left=otherXs[i]+'%';b.style.top=y+'px';b.style.transform=`translate(-50%,-50%) rotate(${otherHeadings[i]}deg)`;});
+ const all=[progress,...otherProgress].map((p,i)=>({p,i})).sort((a,b)=>b.p-a.p);$('position').textContent=(all.findIndex(q=>q.i===0)+1)+' / 3';$('time').textContent=fmt(elapsed);$('scoreText').textContent='Score '+Math.round(score);$('status').textContent=run?'RACING':progress>=1?'FINISHED':'READY';
+ const names=['You','Boat 1','Boat 2'];$('leaderboard').innerHTML=all.map((q,r)=>`<div class="row ${q.i===0?'you':''}"><span class="num">${r+1}</span><span class="boatDot"></span><span>${names[q.i]}</span></div>`).join('');
+ $('windTop').textContent=windSpeed+' m/s';
+}
+function tick(t){if(!run)return;if(!last)last=t;const dt=Math.min(50,t-last);last=t;update(dt,t);render();if(progress>=1){finish();return}raf=requestAnimationFrame(tick)}
+function finish(){run=false;cancelAnimationFrame(raf);$('start').textContent='▶ Start Again';$('status').textContent='FINISHED';$('coachHint').textContent='Race complete — review your line, rate and wind control.';render()}
+function start(){if(run)return;if(progress>=1)reset();run=true;startTime=performance.now()-elapsed*1000;last=0;$('start').textContent='Ⅱ Pause';raf=requestAnimationFrame(tick)}
+function pause(){run=false;cancelAnimationFrame(raf);$('start').textContent='▶ Resume';render()}
+function reset(){run=false;cancelAnimationFrame(raf);progress=0;elapsed=0;x=laneCenters[1];h=0;score=1000;key=0;rate=32;otherProgress=[0,0];otherXs=[laneCenters[0],laneCenters[2]];otherHeadings=[0,0];latVel=0;strokePhase=0;lastPhase=0;waterShift=0;strokeCount=0;callFlashTimer=0;boatSpeed=4.85;displaySpeed=4.85;rudder=0;$('start').textContent='▶ Start Race';$('status').textContent='READY';$('steer').value=0;makeBuoys();makeBoats();render()}
+$('start').onclick=()=>run?pause():start();$('reset').onclick=reset;$('raceSelect').onchange=reset;$('windSlider').oninput=e=>setWindDifficulty(e.target.value,false);$('crewSelect').onchange=e=>setCrew(e.target.value);$('crewSelect2').onchange=e=>setCrew(e.target.value);
+function speakCall(call){
+ const n=Math.max(1,Math.min(50,parseInt($('callNumber').value||10,10)));callNumber=n;
+ let text=call==='Set number'?`NUMBER SET: ${n}`:call==='Number on'?`${n} ON`:call;
+ if(call==='Attention'){rate=Math.max(28,rate);text='ATTENTION';}
+ if(call==='Go'){rate=Math.min(40,rate+1);text='GO';}
+ if(call==='Lengthen')rate=Math.max(28,rate-1);
+ if(call==='Straighten'){steer.value=0;key=0;}
+ if(call==='Pressure on bow side')steerHeadingTarget=clamp(steerHeadingTarget-5,-28,28);
+ if(call==='Pressure on stroke side')steerHeadingTarget=clamp(steerHeadingTarget+5,-28,28);
+ if(call==='Hold the run')rate=Math.max(28,rate-1);
+ if(call==='Settle')rate=Math.max(28,rate-2);
+ if(call==='Build pressure'||call==='Power up')rate=Math.min(40,rate+1);
+ if(call==='Prepare for finish')rate=Math.min(38,rate+1);
+ score=clamp(score+2,0,1000);
+ $('callLog').textContent='CALL: '+text;
+ $('callFlash').textContent=text;
+ $('callFlash').classList.add('show');
+ callFlashTimer=1500;
+ if(call==='Number on')$('callFlash').textContent=`${n} ON`;
+ render();
+}
+document.querySelectorAll('[data-call]').forEach(b=>b.addEventListener('click',()=>speakCall(b.dataset.call)));
+function hold(v){key=v}steer.addEventListener('input',()=>{if(key===0)rudder=clamp(+steer.value/100,-1,1)});for(const [id,v] of [['leftBtn',-1],['rightBtn',1]]){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();hold(v)});['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();hold(0)}))}document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if(e.key==='ArrowLeft'||e.key==='<'){key=-1;e.preventDefault()}if(e.key==='ArrowRight'||e.key==='.'){key=1;e.preventDefault()}const callBtn=document.querySelector(`[data-key="${e.key}"],[data-key="${e.key.toLowerCase()}"]`);if(callBtn){speakCall(callBtn.dataset.call);e.preventDefault()}});document.addEventListener('keyup',e=>{if(['ArrowLeft','<','ArrowRight','.'].includes(e.key))key=0});
+setWindDifficulty(0,true);makeBuoys();makeBoats();render();
+setInterval(()=>{if(!run)return;randomizeWind()},9000+Math.random()*3500);
+})();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body></html>
